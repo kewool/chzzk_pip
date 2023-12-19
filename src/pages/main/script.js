@@ -102,23 +102,6 @@ docQuery("#setting_reset").addEventListener("click", () => {
   ipcRenderer.send("resetPIPSetting");
 });
 
-const user = ipcRenderer.sendSync("getUserProfile");
-if (user.profile) {
-  docQuery(".header_profile img").src = user.profile;
-  docQuery(".username").href = `https://www.twitch.tv/${user.name}`;
-  docQuery(".username p").innerText = user.name;
-  docQuery(".user_sign").addEventListener("click", () => {
-    ipcRenderer.send("logout");
-  });
-  docQuery(".user_sign p").innerText = "로그아웃";
-} else {
-  docQuery(".header_profile img").src = "../../assets/guest.svg";
-  docQuery(".username p").innerText = "게스트";
-  docQuery(".username img").src = "../../assets/question_mark.svg";
-  docQuery(".user_sign").href = "https://www.twitch.tv/login";
-  docQuery(".user_sign p").innerText = "로그인";
-  docQuery(".user_sign img").src = "../../assets/login.svg";
-}
 const info = ipcRenderer.sendSync("getChannelInfo");
 let diffTimeTemp = {};
 let nameTemp = "";

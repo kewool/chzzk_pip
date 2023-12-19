@@ -39,7 +39,7 @@ function createMainWindow() {
       y: 12,
     },
   });
-  //mainWin.setMenu(null);
+  // mainWin.setMenu(null);
   mainWin.loadURL(
     "file://" +
       path.join(page_dir, `pages/main/index.html?platform=${process.platform}`),
@@ -47,6 +47,8 @@ function createMainWindow() {
   mainWin.on("closed", () => {
     mainWin = null;
   });
+
+  mainWin.webContents.openDevTools();
 }
 
 function createBackground() {
@@ -62,11 +64,11 @@ function createBackground() {
   backWin.loadFile(path.join(page_dir, "pages/background/index.html"));
 }
 
-function createPIPWin(url, name) {
-  streamWin[name] = {};
-  streamWin[name].pip = new BrowserWindow({
-    width: store.get("pip_options")[name].size.width,
-    height: store.get("pip_options")[name].size.height,
+function createPIPWin(url, channelId) {
+  streamWin[channelId] = {};
+  streamWin[channelId].pip = new BrowserWindow({
+    width: store.get("pip_options")[channelId].size.width,
+    height: store.get("pip_options")[channelId].size.height,
     minWidth: 240,
     minHeight: 135,
     webPreferences: {
@@ -77,46 +79,51 @@ function createPIPWin(url, name) {
     resizable: true,
     maximizable: false,
     skipTaskbar: true,
-    x: store.get("pip_options")[name].location.x,
-    y: store.get("pip_options")[name].location.y,
-    opacity: store.get("pip_options")[name].opacity,
+    x: store.get("pip_options")[channelId].location.x,
+    y: store.get("pip_options")[channelId].location.y,
+    opacity: store.get("pip_options")[channelId].opacity,
   });
-  streamWin[name].pip.setAspectRatio(16 / 9);
-  streamWin[name].pip.setMenu(null);
-  streamWin[name].pip.loadURL(
+  streamWin[channelId].pip.setAspectRatio(16 / 9);
+  // streamWin[channelId].pip.setMenu(null);
+  streamWin[channelId].pip.loadURL(
     "file://" +
-      path.join(page_dir, `pages/pip/index.html?url=${url}&name=${name}`),
+      path.join(
+        page_dir,
+        `pages/pip/index.html?url=${url}&channelId=${channelId}`,
+      ),
   );
-  streamWin[name].pip.setAlwaysOnTop(true, "screen-saver");
-  streamWin[name].pip.setVisibleOnAllWorkspaces(true);
+  streamWin[channelId].pip.setAlwaysOnTop(true, "screen-saver");
+  streamWin[channelId].pip.setVisibleOnAllWorkspaces(true);
 
-  createLiveWin(name);
+  createLiveWin(channelId);
 }
 
-function createLiveWin(name) {
-  streamWin[name].points = new BrowserWindow({
-    show: false,
+function createLiveWin(channelId) {
+  streamWin[channelId].points = new BrowserWindow({
+    show: true,
     width: 1280,
     height: 720,
   });
-  streamWin[name].points.loadURL("https://twitch.tv/" + name);
-  streamWin[name].points.webContents.setAudioMuted(true);
+  streamWin[channelId].points.loadURL(
+    "https://chzzk.naver.com/live/" + channelId,
+  );
+  streamWin[channelId].points.webContents.setAudioMuted(true);
 }
 
-function createChatWin(name, type) {
-  chatWin[name] = new BrowserWindow({
+function createChatWin(channelId, type) {
+  chatWin[channelId] = new BrowserWindow({
     x:
       type === "stream"
-        ? store.get("pip_options")[name].location.x +
-          store.get("pip_options")[name].size.width
-        : store.get("space_options")[name].location.x +
-          store.get("space_options")[name].size.width,
+        ? store.get("pip_options")[channelId].location.x +
+          store.get("pip_options")[channelId].size.width
+        : store.get("space_options")[channelId].location.x +
+          store.get("space_options")[channelId].size.width,
     y:
       type === "stream"
-        ? store.get("pip_options")[name].location.y
-        : store.get("space_options")[name].location.y,
+        ? store.get("pip_options")[channelId].location.y
+        : store.get("space_options")[channelId].location.y,
     width: 350,
-    height: store.get("pip_options")[name].size.height,
+    height: store.get("pip_options")[channelId].size.height,
     webPreferences: {
       webviewTag: true,
     },
@@ -125,19 +132,20 @@ function createChatWin(name, type) {
     maximizable: false,
     skipTaskbar: true,
   });
-  chatWin[name].setMenu(null);
-  chatWin[name].loadURL(
-    "file://" + path.join(page_dir, `pages/chat/index.html?name=${name}`),
+  chatWin[channelId].setMenu(null);
+  chatWin[channelId].loadURL(
+    "file://" +
+      path.join(page_dir, `pages/chat/index.html?channelId=${channelId}`),
   );
-  chatWin[name].setAlwaysOnTop(true, "screen-saver");
-  chatWin[name].setVisibleOnAllWorkspaces(true);
+  chatWin[channelId].setAlwaysOnTop(true, "screen-saver");
+  chatWin[channelId].setVisibleOnAllWorkspaces(true);
 }
 
-function createSpaceWin(url, name) {
-  spaceWin[name] = {};
-  spaceWin[name].pip = new BrowserWindow({
-    width: store.get("space_options")[name].size.width,
-    height: store.get("space_options")[name].size.height,
+function createSpaceWin(url, channelId) {
+  spaceWin[channelId] = {};
+  spaceWin[channelId].pip = new BrowserWindow({
+    width: store.get("space_options")[channelId].size.width,
+    height: store.get("space_options")[channelId].size.height,
     minWidth: 240,
     minHeight: 135,
     webPreferences: {
@@ -148,18 +156,21 @@ function createSpaceWin(url, name) {
     resizable: true,
     maximizable: false,
     skipTaskbar: true,
-    x: store.get("space_options")[name].location.x,
-    y: store.get("space_options")[name].location.y,
-    opacity: store.get("space_options")[name].opacity,
+    x: store.get("space_options")[channelId].location.x,
+    y: store.get("space_options")[channelId].location.y,
+    opacity: store.get("space_options")[channelId].opacity,
   });
-  spaceWin[name].pip.setAspectRatio(16 / 9);
-  spaceWin[name].pip.setMenu(null);
-  spaceWin[name].pip.loadURL(
+  spaceWin[channelId].pip.setAspectRatio(16 / 9);
+  spaceWin[channelId].pip.setMenu(null);
+  spaceWin[channelId].pip.loadURL(
     "file://" +
-      path.join(page_dir, `pages/space/index.html?url=${url}&name=${name}`),
+      path.join(
+        page_dir,
+        `pages/space/index.html?url=${url}&channelId=${channelId}`,
+      ),
   );
-  spaceWin[name].pip.setAlwaysOnTop(true, "screen-saver");
-  spaceWin[name].pip.setVisibleOnAllWorkspaces(true);
+  spaceWin[channelId].pip.setAlwaysOnTop(true, "screen-saver");
+  spaceWin[channelId].pip.setVisibleOnAllWorkspaces(true);
 }
 
 function createGuideWin() {
@@ -196,7 +207,7 @@ app.on("ready", () => {
   // store.delete("space_auto_start"); //test
   // store.delete("space_options"); //test
   if (!store.get("pip_order")) {
-    store.set("pip_order", config["CHANNEL_NAME"]);
+    store.set("pip_order", config["CHANNEL_ID"]);
     app.setLoginItemSettings({
       openAtLogin: true,
     });
@@ -301,30 +312,31 @@ app.on("activate", () => {
 });
 
 ipcMain.on("getChannelInfo", async (evt) => {
-  const res = await apiClient.users.getUsersByNames(store.get("pip_order"));
   const info = await Promise.all(
-    res.map(async (e) => {
-      const stream = await apiClient.streams.getStreamByUserId(e.id);
-      const follows = await apiClient.channels.getChannelFollowerCount(e);
-      const lastStreamDate = await lib.getLastStreamDate(e.name);
+    store.get("pip_order").map(async (e) => {
+      const user = await lib.getUserById(e);
+      let stream = null;
+      if (user.content.openLive) {
+        stream = await lib.getLiveById(e);
+      }
+      // const lastStreamDate = await lib.getLastStreamDate(e.name);
       let isSpace = null;
       if (store.get("twitter_csrf_token") && store.get("twitter_auth_token")) {
         isSpace = await lib.checkSpace(
           store.get("twitter_csrf_token"),
           store.get("twitter_auth_token"),
-          twitterId[e.name],
+          twitterId[e],
         );
       }
       return {
-        name: e.name,
-        displayName: e.displayName,
-        profile: e.profilePictureUrl,
-        id: e.id,
-        follows: follows,
-        startDate: stream?.startDate ?? false,
-        lastStreamDate: lastStreamDate,
-        isStream: stream ? true : false,
-        game: stream?.gameName,
+        name: e,
+        displayName: user.content.channelName,
+        profile: user.content.channelImageUrl,
+        follows: user.content.followerCount,
+        startDate: stream?.content.openDate ?? false,
+        // lastStreamDate: lastStreamDate,
+        lastStreamDate: 0,
+        isStream: user.content.openLive,
         isSpace: isSpace,
       };
     }),
@@ -340,36 +352,17 @@ ipcMain.handle("getChannelPoint", async (evt, name) => {
   return res;
 });
 
-ipcMain.on("getStream", async (evt, name) => {
-  if (streamWin[name]?.pip || store.get("auto_start")[name].status) {
-    streamWin[name].pip.focus();
+ipcMain.on("getStream", async (evt, channelId) => {
+  if (streamWin[channelId]?.pip || store.get("auto_start")[channelId].status) {
+    streamWin[channelId].pip.focus();
     return;
   }
-  const isStream = (await apiClient.streams.getStreamByUserName(name))
-    ? true
-    : false;
+  const isStream = (await lib.getUserById(channelId)).content.openLive;
   if (isStream) {
-    store.set(`auto_start.${name}.status`, true);
-    const redacted = (await redactedFunc()).a;
-    await lib.getStream(name, false, redacted).then((res) => {
-      createPIPWin(res[0].url, name);
-    });
-  }
-});
-
-ipcMain.on("openSelectPIP", async (evt, name) => {
-  if (streamWin[name]?.pip) {
-    streamWin[name].pip.focus();
-    return;
-  }
-  const isStream = (await apiClient.streams.getStreamByUserName(name))
-    ? true
-    : false;
-  if (isStream) {
-    store.set(`auto_start.${name}.status`, true);
-    const redacted = (await redactedFunc()).a;
-    await lib.getStream(name, false, redacted).then((res) => {
-      createPIPWin(res[0].url, name);
+    store.set(`auto_start.${channelId}.status`, true);
+    lib.getLiveById(channelId).then((res) => {
+      const hls = JSON.parse(res.content.livePlaybackJson).media[0].path;
+      createPIPWin(hls, channelId);
     });
   }
 });
@@ -453,22 +446,20 @@ ipcMain.on("isStreamOff", async (evt, name) => {
   if (!isStream) store.set(`auto_start.${name}.closed`, false);
 });
 
-ipcMain.on("isStreamOffWhileOn", async (evt, name) => {
-  const isStream = (await apiClient.streams.getStreamByUserName(name))
-    ? true
-    : false;
+ipcMain.on("isStreamOffWhileOn", async (evt, channelId) => {
+  const isStream = (await lib.getUserById(channelId)).content.openLive;
   if (!isStream) {
-    streamWin[name].pip.close();
-    streamWin[name].pip = null;
-    streamWin[name].points.close();
-    streamWin[name].points = null;
-    if (chatWin[name]) {
-      chatWin[name].close();
-      chatWin[name] = null;
+    streamWin[channelId].pip.close();
+    streamWin[channelId].pip = null;
+    streamWin[channelId].points.close();
+    streamWin[channelId].points = null;
+    if (chatWin[channelId]) {
+      chatWin[channelId].close();
+      chatWin[channelId] = null;
     }
-    streamWin[name] = null;
-    store.set(`auto_start.${name}.status`, false);
-    store.set(`auto_start.${name}.closed`, false);
+    streamWin[channelId] = null;
+    store.set(`auto_start.${channelId}.status`, false);
+    store.set(`auto_start.${channelId}.closed`, false);
   }
 });
 

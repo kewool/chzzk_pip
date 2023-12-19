@@ -1,6 +1,66 @@
 const { BrowserWindow } = require("electron");
 const https = require("https");
 
+function getUserById(channelId) {
+  const options = {
+    hostname: "api.chzzk.naver.com",
+    port: 443,
+    path: `/service/v1/channels/${channelId}`,
+    method: "GET",
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (response) => {
+      let resData = {};
+      resData.statusCode = response.statusCode;
+      resData.body = [];
+      response.on("data", (chunk) => resData.body.push(chunk));
+      response.on("end", () => {
+        resData.body = resData.body.join("");
+
+        if (resData.statusCode !== 200) {
+          reject(new Error(`${JSON.parse(data.body).message}`));
+        } else {
+          resolve(JSON.parse(resData.body));
+        }
+      });
+    });
+
+    req.on("error", (error) => reject(error));
+    req.end();
+  });
+}
+
+function getLiveById(channelId) {
+  const options = {
+    hostname: "api.chzzk.naver.com",
+    port: 443,
+    path: `/service/v1/channels/${channelId}/live-detail`,
+    method: "GET",
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (response) => {
+      let resData = {};
+      resData.statusCode = response.statusCode;
+      resData.body = [];
+      response.on("data", (chunk) => resData.body.push(chunk));
+      response.on("end", () => {
+        resData.body = resData.body.join("");
+
+        if (resData.statusCode !== 200) {
+          reject(new Error(`${JSON.parse(data.body).message}`));
+        } else {
+          resolve(JSON.parse(resData.body));
+        }
+      });
+    });
+
+    req.on("error", (error) => reject(error));
+    req.end();
+  });
+}
+
 const clientId = "kimne78kx3ncx6brgo4mv6wki5h1ko";
 
 function getAccessToken(id, isVod, redacted = {}) {
@@ -392,6 +452,8 @@ async function getSpaceM3U8(id, ct0, auth_token) {
 }
 
 module.exports = {
+  getUserById: getUserById,
+  getLiveById: getLiveById,
   getStream: getStream,
   getLastStreamDate: getLastStreamDate,
   getChannelPoint: getChannelPoint,

@@ -1,5 +1,9 @@
 {
-    "CHANNEL_NAME": ["viichan6", "gosegugosegu", "cotton__123", "lilpaaaaaa", "jingburger", "vo_ine", "woowakgood", "111roentgenium"],
+    "CHANNEL_ID": ["4d0b7d3f825ea982b95f0a5c2b4782d3", "ac6a03808bffbe58b3bfb0e25271836e"],
+    "TWITTER_ID": {
+        "4d0b7d3f825ea982b95f0a5c2b4782d3": "",
+        "ac6a03808bffbe58b3bfb0e25271836e": ""
+    },
     "TOOLTIP_NAME": "치지직 PiP",
     "RELEASE_URL": "https://github.com/kewool/chzzk_pip/releases"
 }
