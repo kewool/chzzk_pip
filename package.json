@@ -1,0 +1,86 @@
+{
+  "name": "chzzk_pip",
+  "version": "0.1.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "electron .",
+    "lint": "eslint . --ext js --fix",
+    "build": "yarn run build:win && yarn run build:mac",
+    "build:win": "electron-builder --windows nsis:x64 -p always",
+    "build:mac": "electron-builder build --mac -p always"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kewool/chzzk_pip.git"
+  },
+  "author": "kewool",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kewool/chzzk_pip/issues"
+  },
+  "homepage": "https://github.com/kewool/chzzk_pip#readme",
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.3",
+    "electron": "^27.1.0",
+    "electron-builder": "^24.6.4",
+    "electron-log": "^5.0.1",
+    "electron-rebuild": "^3.2.9",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.0"
+  },
+  "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "kewool",
+        "repo": "chzzk_pip"
+      }
+    ],
+    "productName": "chzzk_pip",
+    "appId": "com.kewool.chzzk_pip",
+    "asar": true,
+    "protocols": {
+      "name": "chzzk_pip",
+      "schemes": [
+        "chzzk_pip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "./src/assets/icon3.png"
+    },
+    "mac": {
+      "target": {
+        "target": "default",
+        "arch": "universal"
+      },
+      "icon": "./src/assets/icon4.png"
+    },
+    "dmg": {
+      "title": "chzzk_pip",
+      "icon": "./src/assets/icon4.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "치지직 PiP",
+      "deleteAppDataOnUninstall": true,
+      "perMachine": true
+    },
+    "directories": {
+      "buildResources": "./resources/installer/",
+      "output": "./dist/",
+      "app": "."
+    }
+  }
+}
