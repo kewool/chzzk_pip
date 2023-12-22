@@ -1,4 +1,4 @@
-# ISEGYE PiP
+# Chzzk PiP
 
 .env
 ```
